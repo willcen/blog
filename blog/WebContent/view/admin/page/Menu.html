@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>菜单管理</title>
+<link rel="stylesheet" href="#(g_path)/view/admin/bootstrap/bootstrap.css" />
+<link rel="stylesheet" href="#(g_path)/view/admin/bootstrap/bootstrap-table.min.css" />
+<script src="#(g_path)/view/admin/assets/js/jquery.min.js"></script>
+<script src="#(g_path)/view/admin/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="#(g_path)/view/admin/bootstrap/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="#(g_path)/view/admin/bootstrap/bootstrap-table-zh-CN.min.js"></script>
+<script type="text/javascript" src="#(g_path)/view/admin/bootstrap/bootstrap-treeview.js"></script>
+
+<style>
+.panel-heading {
+	border-color: #ddd;
+}
+</style>
+</head>
+
+<body>
+
+	<div class="panel" style="width: 20%; min-height: 570px; float: left;">
+		<div class="panel-heading">菜单树</div>
+		<div class="panel-body">
+			<div id="tree"></div>
+		</div>
+	</div>
+	<div style="margin-bottom: 5px; text-align: right;">
+		<button class="btn btn-default" data-toggle="modal" data-target="#myModal">添加</button>
+		<button class="btn btn-default"  onclick="onDel()">删除</button>
+	</div>
+	<!-- 模态框（Modal） -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">新增菜单</h4>
+				</div>
+				<div class="modal-body">
+
+					<div class="row">
+						<div class="col-md-4">菜单名称</div>
+						<div class="col-md-4">路径</div>
+						<div class="col-md-4">图标样式</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4">
+							<input type="text" name="menuName" id="menuName" class="form-control" />
+						</div>
+						<div class="col-md-4">
+							<input type="text" name="url" id="url" class="form-control" />
+						</div>
+						<div class="col-md-4">
+							<input type="text" name="iconFa" id="iconFa" class="form-control" />
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn" data-dismiss="modal" onclick="addMenu();">添加</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<div style="float: right; width: 80%; min-height: 550px; border-left: 1px solid #ddd;">
+<!-- 		<div id="toolbar"> -->
+<!-- 	        <a href="javascript:void(0);" class="btn btn-primary btn-xs" onclick="resource_addWindow('');"><i class="icon iconfont">&#xe611;</i>新增</a> -->
+<!-- 	        <a href="javascript:void(0);" class="btn btn-danger btn-xs" onclick="wf.resource_delete();"><i class="icon iconfont">&#xe612;</i>删除</a> -->
+<!--         </div> -->
+		<table id="table" style=""></table>
+	</div>
+
+</body>
+
+</html>
+<script>
+	var table = $("#table");
+	_initTable();
+	function _initTable() {
+		table.bootstrapTable({ // 对应table标签的id
+		// 		url: "#(g_path)/menu/list", // 获取表格数据的url
+			cache : true, // 设置为 false 禁用 AJAX 数据缓存， 默认为true
+			striped : true, //表格显示条纹，默认为false
+			pagination : true, // 在表格底部显示分页组件，默认false
+			pageList : [ 10, 20 ], // 设置页面可以显示的数据条数
+			pageSize : 10, // 页面数据条数
+			pageNumber : 1, // 首页页码
+			sidePagination : 'client', // 设置为服务器端分页client server
+			// 		queryParams: function(params) { // 请求服务器数据时发送的参数，可以在这里添加额外的查询参数，返回false则终止请求
+			// 			return {
+			// 				pageSize: params.limit, // 每页要显示的数据条数
+			// 				offset: params.offset, // 每页显示数据的开始行号
+			// 				sort: params.sort, // 要排序的字段
+			// 				sortOrder: params.order // 排序规则
+			// 					//            dataId: $("#dataId").val() // 额外添加的参数
+			// 			}
+			// 		},
+			// 		sortName: 'id', // 要排序的字段
+			// 		sortOrder: 'desc', // 排序规则
+			columns : [ {
+				checkbox : true, // 显示一个勾选框
+				align : 'center' // 居中显示
+			}, {
+				field : 'menuName', // 返回json数据中的name
+				title : '菜单名称', // 表格表头显示文字
+				align : 'center', // 左右居中
+				valign : 'middle' // 上下居中
+			}, {
+				field : 'url',
+				title : '路径',
+				align : 'center',
+				valign : 'middle'
+			}, {
+				field : 'iconFa',
+				title : '图标样式',
+				align : 'center',
+				valign : 'middle'
+			} ],
+			onLoadSuccess : function() { //加载成功时执行
+				console.info("加载成功");
+			},
+			onLoadError : function() { //加载失败时执行
+				console.info("加载数据失败");
+			}
+		})
+	}
+</script>
+
+<!-- 菜单树-->
+<script>
+	var tree = $('#tree');
+	_initTableTree();
+	function _initTableTree() {
+		$.ajax({
+			type : "post",
+			url : "#(g_path)/menu/tableTree",
+			async : true,
+			dataType : "json",
+			success : function(data) {
+				
+// 				for(let i=0;i<data.length;i++){
+// 					data[0].state={checked:true}
+// 				}
+				
+				//console.log(data)
+				tree.treeview({
+					data : data,
+					showBorder : false
+				});
+				tree.on("nodeSelected", onTreeSelect);
+			},
+			error : function(msg) {
+				alert("网络出错,请稍后再试!")
+			}
+		});
+	}
+
+	function onTreeSelect(e, node) {
+		console.log(node.id);
+		table.bootstrapTable('destroy');
+		_initTable();
+		table.bootstrapTable('refreshOptions', {
+			url : '#(g_path)/menu/list?nodeid='+node.id
+		});
+	}
+
+	// 	tree.treeview({
+	// 		data: '#(g_path)/tree',
+	// 		showBorder: false
+
+	// 	});
+
+	// 	function getTree() {
+	// 		var tree = [{
+	// 			id:"1",
+	// 			pid:"0",
+	// 			text: "商品管理",
+	// 			url: "",
+	// 			iconFa: "",
+	// 			nodes: [{
+	// 				id:"11",
+	// 				pid:"1",
+	// 				text: "商品列表",
+	// 				url: "",
+	// 				iconFa: ""
+	// 			}, {
+	// 				id:"12",
+	// 				pid:"1",
+	// 				text: "商品分类",
+	// 				url: "",
+	// 				iconFa: ""
+	// 			}, {
+	// 				id:"13",
+	// 				pid:"1",
+	// 				text: "商品管理",
+	// 				url: "",
+	// 				iconFa: ""
+	// 			}]
+	// 		}, {
+	// 			id:"2",
+	// 			pid:"0",
+	// 			text: "系统设置",
+	// 			nodes: [{
+	// 				id:"21",
+	// 				pid:"2",
+	// 				text: "菜单管理",
+	// 				url: "",
+	// 				iconFa: ""
+	// 			}, {
+	// 				id:"22",
+	// 				pid:"2",
+	// 				text: "权限设置",
+	// 				url: "",
+	// 				iconFa: ""
+	// 			}]
+	// 		}];
+	// 		return tree;
+	// 	}
+</script>
+
+<script>
+	function addMenu() {
+		let menuName = $("#menuName").val();
+		let iconFa = $("#iconFa").val();
+		let url = $("#url").val();
+		if (menuName.trim().length == 0) {
+			alert("菜单名称不能为空!");
+			return;
+		}
+
+		var node = tree.treeview('getSelected')[0];
+		var pid = "";
+
+		if (node) {
+			pid = node.id;
+		} else {
+			pid = "0";
+		}
+		var param = {
+			pid : pid,
+			menuName : menuName,
+			iconFa : iconFa,
+			url : url
+		}
+
+		$.ajax({
+			type : "post",
+			url : "#(g_path)/menu/add_menu",
+			async : true,
+			data : param,
+			dataType : "json",
+			success : function(re) {
+				if (re.isOk) {
+
+					table.bootstrapTable('destroy');
+					_initTable();
+					table.bootstrapTable('refreshOptions', {
+						url : '#(g_path)/menu/list'
+					});
+					_initTableTree();
+					// table.bootstrapTable('refreshOptions',{url:'#(g_path)/menu/list'});
+
+				}
+			},
+			error : function(msg) {
+				alert("网络出错,请稍后再试!")
+			}
+		});
+	}
+	
+	function onDel(){
+		var select = table.bootstrapTable('getSelections');
+		var ids = new Array();
+		for(let i=0;i<select.length;i++){
+			ids[i] = select[i].id ;
+		}
+		var param={ids:ids}
+		console.log(ids);
+		$.ajax({
+			type : "post",
+			url : "#(g_path)/menu/del",
+			async : true,
+			data : param, 
+			dataType : "json",
+			success : function(re) {
+				if (re.isOk) {
+					table.bootstrapTable('destroy');
+					_initTable();
+					table.bootstrapTable('refreshOptions', {
+						url : '#(g_path)/menu/list'
+					});
+					_initTableTree();
+				}
+			},
+			error : function(msg) {
+				alert("网络出错,请稍后再试!")
+			}
+		});
+	}
+</script>

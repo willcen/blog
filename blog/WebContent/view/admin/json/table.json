@@ -1,0 +1,19 @@
+[{
+		"cdmc":"商品管理555",
+		"url":"/menu/aa",
+		"icon":"am-fa-cion"
+		
+	},{
+		"cdmc":"商品添加555",
+		"url":"/zs",
+		"icon":"am-faaa-cion"
+
+},{
+		"cdmc":"商品删除555",
+		"url":"/zs/ss",
+		"icon":"am-faaa-cion"
+
+}]
+
+
+

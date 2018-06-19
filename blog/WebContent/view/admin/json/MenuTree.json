@@ -1,0 +1,51 @@
+[
+	{
+		"id": "1",
+		"pid": "0",
+		"text": "商品管理",
+		"iconFa": "am-icon-flag",
+		"url": "",
+		"nodes": [
+			{
+				"id": "11",
+				"pid": "1",
+				"text": "商品列表",
+				"iconFa": "",
+				"url": "/menu/view_menu"
+			}, {
+				"id": "12",
+				"pid": "1",
+				"text": "商品分类",
+				"iconFa": "",
+				"url": "/menu/view_menu"
+			}
+		]
+	}, {
+		"id": "2",
+		"pid": "0",
+		"text": "系统设置",
+		"iconFa": "am-icon-gears",
+		"url": "",
+		"nodes": [
+			{
+				"id": "21",
+				"pid": "2",
+				"text": "菜单管理",
+				"iconFa": "",
+				"url": "/menu/view_menu"
+			}, {
+				"id": "22",
+				"pid": "2",
+				"text": "权限管理",
+				"iconFa": "",
+				"url": "/menu/view_menu"
+			}
+		]
+	}, {
+		"id": "3",
+		"pid": "0",
+		"text": "特殊",
+		"iconFa": "am-icon-gears",
+		"url": ""
+	}
+]

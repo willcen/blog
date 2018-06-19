@@ -5,7 +5,7 @@ import com.jfinal.kit.PathKit;
 
 public class App {
 	public static void main(String[] args) {
-		JFinal.start("WebContent",8080,"/",5);
+		JFinal.start("WebContent",8080,"/",3);
 	}
 
 }
